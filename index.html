@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,10 +52,10 @@
         </div>
         
         <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
-            वेब डेवलपर पोर्टफोलियो <span class="gradient-text">& लिंक्स हब</span>
+            Web Developer Portfolio <span class="gradient-text">& Links Hub</span>
         </h1>
         <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
-            नमस्ते! यहाँ मेरे सारे प्रोजेक्ट्स, लाइव डेमो, और क्रिएशंस एक ही जगह पर समराइज़्ड हैं।
+            Hello! Here is a summarized collection of all my projects, live demos, and creations in one place.
         </p>
 
         <!-- Dynamic Category Filters -->
@@ -72,7 +72,7 @@
         <!-- Loading Spinner -->
         <div id="loader" class="text-center py-12">
             <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-500 mb-3"></i>
-            <p class="text-slate-400 text-sm">फायरबेस से प्रोजेक्ट्स लोड हो रहे हैं...</p>
+            <p class="text-slate-400 text-sm">Loading projects from Firebase...</p>
         </div>
 
         <!-- Projects Grid Container -->
@@ -83,8 +83,8 @@
         <!-- Empty State -->
         <div id="emptyState" class="hidden text-center py-12 glass-card rounded-2xl">
             <i class="fa-solid fa-folder-open text-4xl text-slate-600 mb-3"></i>
-            <h3 class="text-lg font-semibold text-slate-300">डेटा उपलब्ध नहीं है</h3>
-            <p class="text-slate-500 text-sm mt-1">डेटाबेस में अभी कोई प्रोजेक्ट मौजूद नहीं है।</p>
+            <h3 class="text-lg font-semibold text-slate-300">No Data Available</h3>
+            <p class="text-slate-500 text-sm mt-1">There are no projects currently available in the database.</p>
         </div>
     </main>
 
@@ -130,7 +130,7 @@
                 }
             } catch (error) {
                 console.error("Firebase fetch error:", error);
-                loader.innerHTML = `<p class="text-rose-400 text-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i> डेटा लोड करने में त्रुटि!</p>`;
+                loader.innerHTML = `<p class="text-rose-400 text-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Error loading data!</p>`;
             }
         }
 
@@ -218,5 +218,4 @@
         fetchProjects();
     </script>
 </body>
-  </html>
-  
+</html>
