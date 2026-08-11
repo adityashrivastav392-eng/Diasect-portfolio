@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portfolio & Link Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-3px);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+
+    <!-- Header / Profile Section -->
+    <header class="w-full max-w-4xl text-center mb-10">
+        <div class="relative inline-block mb-4">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full gradient-bg p-1 mx-auto shadow-lg shadow-indigo-500/30">
+                <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-3xl sm:text-4xl text-indigo-400 font-bold">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+            </div>
+            <span class="absolute bottom-1 right-1 bg-emerald-500 text-xs px-2 py-0.5 rounded-full font-medium text-slate-950 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-slate-950 animate-ping"></span> Live
+            </span>
+        </div>
+        
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+            वेब डेवलपर पोर्टफोलियो <span class="gradient-text">& लिंक्स हब</span>
+        </h1>
+        <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
+            नमस्ते! यहाँ मेरे सारे प्रोजेक्ट्स, लाइव डेमो, और क्रिएशंस एक ही जगह पर समराइज़्ड हैं।
+        </p>
+
+        <!-- Dynamic Category Filters -->
+        <div class="flex flex-wrap justify-center gap-2 mt-6" id="categoryFilters">
+            <button onclick="filterProjects('all')" class="filter-btn active bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-medium transition">All Projects</button>
+            <button onclick="filterProjects('Web Apps')" class="filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-full text-sm font-medium transition">Web Apps</button>
+            <button onclick="filterProjects('E-Commerce')" class="filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-full text-sm font-medium transition">E-Commerce</button>
+            <button onclick="filterProjects('UI/UX')" class="filter-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-full text-sm font-medium transition">UI/UX</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-4xl">
+        <!-- Loading Spinner -->
+        <div id="loader" class="text-center py-12">
+            <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-500 mb-3"></i>
+            <p class="text-slate-400 text-sm">फायरबेस से प्रोजेक्ट्स लोड हो रहे हैं...</p>
+        </div>
+
+        <!-- Projects Grid Container -->
+        <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+            <!-- Dynamic Project Cards Will Appear Here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12 glass-card rounded-2xl">
+            <i class="fa-solid fa-folder-open text-4xl text-slate-600 mb-3"></i>
+            <h3 class="text-lg font-semibold text-slate-300">डेटा उपलब्ध नहीं है</h3>
+            <p class="text-slate-500 text-sm mt-1">डेटाबेस में अभी कोई प्रोजेक्ट मौजूद नहीं है।</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 text-center text-xs text-slate-500">
+        <p>© Developer Portfolio & Links Hub • Fetching Live from Firebase</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Direct Firebase Realtime Database URL
+        const FIREBASE_DB_URL = "https://sate-5a04f-default-rtdb.asia-southeast1.firebasedatabase.app"; 
+
+        let allProjects = [];
+
+        // Fetch Projects from Firebase using REST API
+        async function fetchProjects() {
+            const loader = document.getElementById('loader');
+            const grid = document.getElementById('projectsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            try {
+                let response = await fetch(`${FIREBASE_DB_URL}/.json`);
+                let data = await response.json();
+
+                if (data && data.projects) {
+                    data = data.projects;
+                }
+
+                loader.classList.add('hidden');
+                allProjects = [];
+
+                if (data && typeof data === 'object') {
+                    Object.keys(data).forEach(id => {
+                        if (data[id] && typeof data[id] === 'object') {
+                            allProjects.push({ id, ...data[id] });
+                        }
+                    });
+                    renderProjects(allProjects);
+                } else {
+                    grid.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Firebase fetch error:", error);
+                loader.innerHTML = `<p class="text-rose-400 text-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i> डेटा लोड करने में त्रुटि!</p>`;
+            }
+        }
+
+        // Render Projects Cards
+        function renderProjects(projects) {
+            const grid = document.getElementById('projectsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (projects.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+            grid.innerHTML = '';
+
+            projects.forEach(project => {
+                const techBadges = project.tech ? project.tech.split(',').map(t => `<span class="bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 text-[11px] font-medium px-2 py-0.5 rounded-md">${t.trim()}</span>`).join('') : '';
+
+                const category = project.category || 'Project';
+                const title = project.title || 'Untitled Project';
+                const summary = project.summary || 'No summary available.';
+                const liveUrl = project.liveUrl || '#';
+
+                const cardHtml = `
+                    <div class="glass-card rounded-2xl p-5 flex flex-col justify-between transition-all duration-300">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-indigo-400 border border-slate-700">
+                                    ${category}
+                                </span>
+                            </div>
+
+                            <h3 class="text-lg font-bold text-white mb-2">${title}</h3>
+                            <p class="text-slate-300 text-sm mb-4 line-clamp-3">${summary}</p>
+
+                            ${project.result ? `
+                                <div class="mb-4 bg-emerald-950/40 border border-emerald-800/40 rounded-lg p-2.5 flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-line text-emerald-400 text-xs"></i>
+                                    <span class="text-emerald-300 text-xs font-medium">${project.result}</span>
+                                </div>
+                            ` : ''}
+
+                            <div class="flex flex-wrap gap-1.5 mb-5">
+                                ${techBadges}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-3 border-t border-slate-800">
+                            <a href="${liveUrl}" target="_blank" class="flex-1 text-center bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 rounded-lg transition flex items-center justify-center gap-1.5">
+                                <span>Live Demo</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                            ${project.githubUrl ? `
+                                <a href="${project.githubUrl}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                                    <i class="fa-brands fa-github text-sm"></i> Code
+                                </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+        }
+
+        // Filter Projects
+        function filterProjects(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+            event.target.classList.remove('bg-slate-800', 'text-slate-300');
+            event.target.classList.add('bg-indigo-600', 'text-white');
+
+            if (category === 'all') {
+                renderProjects(allProjects);
+            } else {
+                const filtered = allProjects.filter(p => p.category === category);
+                renderProjects(filtered);
+            }
+        }
+
+        // Initialize Fetch
+        fetchProjects();
+    </script>
+</body>
+  </html>
+  
